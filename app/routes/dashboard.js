@@ -17,7 +17,13 @@ router.get('/archives', function(req, res, next) {
   
   // 分類頁面
   router.get('/categories', function(req, res, next) {
-    res.render('dashboard/categories', { title: 'Express' });
+    categoriesRef.once('value',(sna)=>{
+       const categories = sna.val();
+       res.render('dashboard/categories', { 
+        title: 'Express',
+        categories
+    });
+    })
   });
   
   // 分類頁面
