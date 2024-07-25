@@ -2,7 +2,14 @@
 
 <div class="row justify-content-center">
   <div class="col-md-6">
-    
+
+    <% if (hasinfo) {%>
+      <% for (item in message){%>
+        <div class="alert alert-warning">
+          <%-message[item] %>
+        </div>
+      <% }%>
+    <% }%>
     
     <table class="table">
       <thead>
@@ -18,7 +25,7 @@
             <td class="align-middle"><%-categories[item].name %></td>
             <td><input type="text" class="form-control form-control-sm" value="<%-categories[item].path%>"></td>
             <td class="align-middle">
-              <form method="POST">
+              <form method="POST" action="/dashboard/categories/delete/<%-item%>">
                 <button type="submit" class="btn btn-outline-danger btn-sm">刪除</button>
               </form>
             </td>

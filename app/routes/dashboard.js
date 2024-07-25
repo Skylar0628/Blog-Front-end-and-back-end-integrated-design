@@ -17,11 +17,14 @@ router.get('/archives', function(req, res, next) {
   
   // 分類頁面
   router.get('/categories', function(req, res, next) {
+    const message = req.flash('info');
     categoriesRef.once('value',(sna)=>{
        const categories = sna.val();
        res.render('dashboard/categories', { 
         title: 'Express',
-        categories
+        categories,
+        message,
+        hasinfo: message.length > 0
     });
     })
   });
@@ -36,6 +39,7 @@ router.get('/archives', function(req, res, next) {
     res.render('dashboard/signup', { title: 'Express' });
   });
 
+////////////////////////////////////////////////////////
 
   // 新增分類
   router.post('/categories/create', function(req, res, next) {
@@ -55,6 +59,15 @@ router.get('/archives', function(req, res, next) {
         res.redirect('/dashboard/categories');
     });
   });
+
+  router.post('/categories/delete/:id', function(req, res, next){
+     const id = req.params.id;
+     categoriesRef.child(id).remove();
+     req.flash('info',"欄位已刪除");   //存在session 裡面
+     res.redirect('/dashboard/categories');
+  })
+
+  
   
 
 module.exports = router;
