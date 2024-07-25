@@ -1,80 +1,100 @@
 var express = require('express');
 var router = express.Router();
-const {db} = require('../connections/firebase_admin_connect');
+const { db } = require('../connections/firebase_admin_connect');
 
 const categoriesRef = db.ref('categories');
-
+const articlesRef = db.ref('articles');
 
 // 檔案頁面
-router.get('/archives', function(req, res, next) {
+router.get('/archives', function (req, res, next) {
     res.render('dashboard/archives', { title: 'Express' });
-  });
-  
-  // 文章頁面
-  router.get('/article', function(req, res, next) {
-    res.render('dashboard/article', { title: 'Express' });
-  });
-  
-  // 分類頁面
-  router.get('/categories', function(req, res, next) {
-    const message = req.flash('info');
-    categoriesRef.once('value',(sna)=>{
-       const categories = sna.val();
-       res.render('dashboard/categories', { 
-        title: 'Express',
-        categories,
-        message,
-        hasinfo: message.length > 0
+});
+
+// 文章頁面
+router.get('/article/create', function (req, res, next) {
+    categoriesRef.once('value', (sna) => {
+        const categories = sna.val();
+        res.render('dashboard/article', {
+            title: 'Express',
+            categories
+        });
     });
+});
+
+// 分類頁面
+router.get('/categories', function (req, res, next) {
+    const message = req.flash('info');
+    categoriesRef.once('value', (sna) => {
+        const categories = sna.val();
+        res.render('dashboard/categories', {
+            title: 'Express',
+            categories,
+            message,
+            hasinfo: message.length > 0
+        });
     })
-  });
-  
-  // 分類頁面
-  router.get('/categories', function(req, res, next) {
+});
+
+// 分類頁面
+router.get('/categories', function (req, res, next) {
     res.render('dashboard/categories', { title: 'Express' });
-  });
-  
-  // 註冊頁面
-  router.get('/signup', function(req, res, next) {
+});
+
+// 註冊頁面
+router.get('/signup', function (req, res, next) {
     res.render('dashboard/signup', { title: 'Express' });
-  });
+});
 
 ////////////////////////////////////////////////////////
 
-  // 新增分類
-  router.post('/categories/create', function(req, res, next) {
+router.post('/article/create', function (req, res, next) {
+   const data = req.body;
+   const currentData = {...data}
+   const articleRef = articlesRef.push();
+   const key = articleRef.key;
+   const updataTime = Math.floor(Date.now() / 1000);
+   currentData.id = key
+   currentData.updataTime = updataTime
+
+   articleRef.set(currentData).then((result)=>{
+    res.redirect('/dashboard/article/create') 
+   });
+});
+
+// 新增分類
+router.post('/categories/create', function (req, res, next) {
     const data = req.body;
-    const plainData = {...data}
+    const plainData = { ...data }
     const category = categoriesRef.push();
     const key = category.key;
     plainData.id = key;
     // 相同path過濾
-    categoriesRef.orderByChild('path').equalTo(plainData.path).once('value',function(sna){
-        if(sna.val()) {
+    categoriesRef.orderByChild('path').equalTo(plainData.path).once('value', function (sna) {
+        if (sna.val()) {
             req.flash('info', "已經有相同路徑");
             res.redirect('/dashboard/categories');
         } else {
             category.set(plainData)
-            .then(()=>{
-                res.redirect('/dashboard/categories');
-            })
-            .catch((err)=>{
-                console.log(err);
-                res.redirect('/dashboard/categories');
-            });  
+                .then(() => {
+                    res.redirect('/dashboard/categories');
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.redirect('/dashboard/categories');
+                });
         }
     })
-  });
+});
 
-  // 刪除分類
-  router.post('/categories/delete/:id', function(req, res, next){
-     const id = req.params.id;
-     categoriesRef.child(id).remove();
-     req.flash('info',"欄位已刪除");   //存在session 裡面
-     res.redirect('/dashboard/categories');
-  })
+// 刪除分類
+router.post('/categories/delete/:id', function (req, res, next) {
+    const id = req.params.id;
+    categoriesRef.child(id).remove();
+    req.flash('info', "欄位已刪除");   //存在session 裡面
+    res.redirect('/dashboard/categories');
+})
 
-  
-  
+
+
 
 module.exports = router;
