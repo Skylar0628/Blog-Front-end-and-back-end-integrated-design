@@ -48,18 +48,25 @@ router.get('/archives', function(req, res, next) {
     const category = categoriesRef.push();
     const key = category.key;
     plainData.id = key;
-
-    category.set(plainData)
-    .then((result)=>{
-        console.log(result);
-        res.redirect('/dashboard/categories');
+    // 相同path過濾
+    categoriesRef.orderByChild('path').equalTo(plainData.path).once('value',function(sna){
+        if(sna.val()) {
+            req.flash('info', "已經有相同路徑");
+            res.redirect('/dashboard/categories');
+        } else {
+            category.set(plainData)
+            .then(()=>{
+                res.redirect('/dashboard/categories');
+            })
+            .catch((err)=>{
+                console.log(err);
+                res.redirect('/dashboard/categories');
+            });  
+        }
     })
-    .catch((err)=>{
-        console.log(err);
-        res.redirect('/dashboard/categories');
-    });
   });
 
+  // 刪除分類
   router.post('/categories/delete/:id', function(req, res, next){
      const id = req.params.id;
      categoriesRef.child(id).remove();
