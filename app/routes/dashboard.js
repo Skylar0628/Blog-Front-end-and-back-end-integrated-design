@@ -21,6 +21,25 @@ router.get('/article/create', function (req, res, next) {
     });
 });
 
+// 相同版型製作新增與轉址
+router.get('/article/:id', function (req, res, next) {
+    const id = req.params.id;
+    let categories = {};
+    categoriesRef.once('value').then((sna)=>{
+        categories = sna.val();
+        return articlesRef.child(id).once('value')
+    }).then((sna)=>{
+        const articles = sna.val();
+        res.render('dashboard/article',{
+            title: 'Express',
+            categories,
+            articles
+        })
+    })
+       
+});
+
+
 // 分類頁面
 router.get('/categories', function (req, res, next) {
     const message = req.flash('info');
@@ -35,10 +54,6 @@ router.get('/categories', function (req, res, next) {
     })
 });
 
-// 分類頁面
-router.get('/categories', function (req, res, next) {
-    res.render('dashboard/categories', { title: 'Express' });
-});
 
 // 註冊頁面
 router.get('/signup', function (req, res, next) {
@@ -56,8 +71,8 @@ router.post('/article/create', function (req, res, next) {
    currentData.id = key
    currentData.updataTime = updataTime
 
-   articleRef.set(currentData).then((result)=>{
-    res.redirect('/dashboard/article/create') 
+   articleRef.set(currentData).then(()=>{
+    res.redirect(`/dashboard/article/${key}`) 
    });
 });
 
