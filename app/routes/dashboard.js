@@ -11,12 +11,15 @@ const articlesRef = db.ref('articles');
 router.get('/archives', function (req, res, next) {
     let categories = {};
     const articles = [];
+    const status = req.query.status || 'public'
     categoriesRef.once('value').then((sna)=>{
         categories = sna.val();
         return articlesRef.orderByChild('updataTime').once('value')
     }).then((sna)=>{
         sna.forEach((item)=>{
-          articles.push(item.val());
+            if(status === item.val().status){
+                articles.push(item.val());
+            }
         });
         articles.reverse(); // 陣列的方法
         res.render('dashboard/archives', { 
@@ -24,7 +27,8 @@ router.get('/archives', function (req, res, next) {
             categories,
             articles,
             striptags,
-            moment
+            moment,
+            status
         });
     });
 });
