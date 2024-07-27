@@ -6,7 +6,13 @@
 
 
 <form  
+<% if(articles.id) { %>
+  action="/dashboard/article/update/<%-articles.id%>"
+
+<% } else { %>
   action="/dashboard/article/create"
+<% } %>
+
   method="POST" 
   class="row justify-content-center">
   <div class="col-md-6">
@@ -48,11 +54,11 @@
       <h6 class="card-header">是否公開</h6>
       <div class="card-body">
         <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-          <label class="btn btn-outline-primary w-100 " >
-            <input type="radio" name="status" autocomplete="off" value="draft" > 草稿
+          <label class="btn btn-outline-primary w-100 <% if(articles.status === 'draft') {%>active<%}%> " >
+            <input type="radio" name="status" autocomplete="off" value="draft" <% if(articles.status === 'draft') {%>checked<%}%>> 草稿
           </label>
-          <label class="btn btn-outline-primary w-100 ">
-            <input type="radio" name="status" autocomplete="off" value="public"> 公開
+          <label class="btn btn-outline-primary w-100 <% if(articles.status === 'public') {%>active<%}%> ">
+            <input type="radio" name="status" autocomplete="off" value="public" <% if(articles.status === 'public') {%>checked<%}%> > 公開
           </label>
         </div>
       </div>

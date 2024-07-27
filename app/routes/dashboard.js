@@ -35,8 +35,7 @@ router.get('/article/:id', function (req, res, next) {
             categories,
             articles
         })
-    })
-       
+    })  
 });
 
 
@@ -62,6 +61,7 @@ router.get('/signup', function (req, res, next) {
 
 ////////////////////////////////////////////////////////
 
+// 新增文章
 router.post('/article/create', function (req, res, next) {
    const data = req.body;
    const currentData = {...data}
@@ -75,6 +75,16 @@ router.post('/article/create', function (req, res, next) {
     res.redirect(`/dashboard/article/${key}`) 
    });
 });
+
+// 修改文章
+router.post('/article/update/:id', function (req, res, next) {
+    const data = req.body;
+    const id = req.params.id;
+    const initData = {...data}
+    articlesRef.child(id).update(initData).then(()=>{
+      res.redirect(`/dashboard/article/${id}`);
+    });
+ });
 
 // 新增分類
 router.post('/categories/create', function (req, res, next) {
