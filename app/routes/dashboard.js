@@ -2,12 +2,31 @@ var express = require('express');
 var router = express.Router();
 const { db } = require('../connections/firebase_admin_connect');
 
+const striptags = require('striptags');
+const moment = require('moment');
 const categoriesRef = db.ref('categories');
 const articlesRef = db.ref('articles');
 
 // 檔案頁面
 router.get('/archives', function (req, res, next) {
-    res.render('dashboard/archives', { title: 'Express' });
+    let categories = {};
+    const articles = [];
+    categoriesRef.once('value').then((sna)=>{
+        categories = sna.val();
+        return articlesRef.orderByChild('updataTime').once('value')
+    }).then((sna)=>{
+        sna.forEach((item)=>{
+          articles.push(item.val());
+        });
+        articles.reverse(); // 陣列的方法
+        res.render('dashboard/archives', { 
+            title: 'Express',
+            categories,
+            articles,
+            striptags,
+            moment
+        });
+    });
 });
 
 // 文章頁面
