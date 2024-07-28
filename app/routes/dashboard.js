@@ -107,7 +107,17 @@ router.post('/article/update/:id', function (req, res, next) {
     articlesRef.child(id).update(initData).then(()=>{
       res.redirect(`/dashboard/article/${id}`);
     });
- });
+});
+
+// 刪除文章
+router.post('/article/delete/:id', function (req, res, next) {
+    const id = req.params.id;
+    articlesRef.child(id).remove();
+    req.flash('info', "文章已刪除");   //存在session 裡面 
+    //補充 ajax 不需要重新導向
+    res.send('文章已刪除');
+    res.end();
+})
 
 // 新增分類
 router.post('/categories/create', function (req, res, next) {
