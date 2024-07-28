@@ -6,6 +6,7 @@ const striptags = require('striptags');
 const moment = require('moment');
 const categoriesRef = db.ref('categories');
 const articlesRef = db.ref('articles');
+const conversPagination = require('../modules/conversPagination');
 
 
 /* GET home page. */
@@ -23,43 +24,15 @@ router.get('/', function(req, res, next) {
           }
       });
 
-      // 分頁
-
-      const totalResult = articles.length;
-      const perpage = 3; // 每頁3筆
-      const perpageTotal = Math.ceil(totalResult / perpage);
-      // const currentPage = 1;
-      if(currentPage > perpageTotal) {
-        currentPage = perpageTotal
-      }
-
-      const miniitem = (currentPage * perpage) - perpage + 1;
-      const maxitem = (currentPage * perpage);
-      const data =[];
-      articles.forEach((item, i)=>{
-        let itemNum = i + 1;
-        if (itemNum >= miniitem && itemNum<= maxitem){
-          data.push(item)
-        }
-      });
-      const page = {
-        perpageTotal,
-        currentPage,
-        hasPer: currentPage > 1,
-        hasNex: currentPage < perpageTotal
-       }
-
-       console.log()
-      // 分頁結束
-
       articles.reverse(); // 陣列的方法
+      const data = conversPagination(articles, currentPage)
       res.render('index', { 
           title: 'Express',
           categories,
-          articles: data,
+          articles: data.data,
           striptags,
           moment,
-          page
+          page: data.page
       });
   });
 
