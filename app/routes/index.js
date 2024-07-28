@@ -10,6 +10,7 @@ const articlesRef = db.ref('articles');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  const currentPage = req.query.page || 1;
   let categories = {};
   const articles = []
   categoriesRef.once('value').then((sna)=>{
@@ -21,13 +22,42 @@ router.get('/', function(req, res, next) {
               articles.push(item.val());
           }
       });
+
+      // 分頁
+
+      const totalResult = articles.length;
+      const perpage = 3; // 每頁3筆
+      const perpageTotal = Math.ceil(totalResult / perpage);
+      // const currentPage = 1;
+      if(currentPage > perpageTotal) {
+        currentPage = perpageTotal
+      }
+
+      const miniitem = (currentPage * perpage) - perpage + 1;
+      const maxitem = (currentPage * perpage);
+      const data =[];
+      articles.forEach((item, i)=>{
+        let itemNum = i + 1;
+        if (itemNum >= miniitem && itemNum<= maxitem){
+          data.push(item)
+        }
+      });
+      const page = {
+        perpageTotal,
+        currentPage,
+        hasPer: currentPage > 1,
+        hasNex: currentPage < perpageTotal
+       }
+      // 分頁結束
+
       articles.reverse(); // 陣列的方法
       res.render('index', { 
           title: 'Express',
           categories,
-          articles,
+          articles: data,
           striptags,
           moment,
+          page
       });
   });
 
