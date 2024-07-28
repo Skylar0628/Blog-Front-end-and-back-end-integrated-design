@@ -61,7 +61,6 @@ router.get('/article/:id', function (req, res, next) {
     })  
 });
 
-
 // 分類頁面
 router.get('/categories', function (req, res, next) {
     const message = req.flash('info');
@@ -75,7 +74,6 @@ router.get('/categories', function (req, res, next) {
         });
     })
 });
-
 
 // 註冊頁面
 router.get('/signup', function (req, res, next) {
