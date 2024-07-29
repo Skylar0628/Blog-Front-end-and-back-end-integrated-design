@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var flash = require('connect-flash');
-
+require('dotenv').config();
 
 
 var app = express();
@@ -28,11 +28,22 @@ app.use(session({
   cookie: {maxAge: 100 * 1000}
 }));
 
+const authCheck = function(req, res, next){
+  console.log('middleware' , req.session)
+  if(req.session.uid === process.env.ADMIN_UID){
+    return next();
+  }
+  return res.redirect('/auth/signin')
+}
+
 // Router
 var indexRouter = require('./routes/index');
 var dashboard = require('./routes/dashboard');
+var auth = require('./routes/auth');
+
 app.use('/', indexRouter);
-app.use('/dashboard', dashboard);
+app.use('/dashboard',authCheck, dashboard);
+app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

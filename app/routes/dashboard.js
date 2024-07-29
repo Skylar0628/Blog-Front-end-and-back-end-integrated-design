@@ -7,6 +7,14 @@ const moment = require('moment');
 const categoriesRef = db.ref('categories');
 const articlesRef = db.ref('articles');
 
+router.get('/', function(req,res){
+    const message = req.flash('error');
+    res.render('dashboard/index',{
+        title: "express",
+        hasError: message.length > 0
+    })
+})
+
 // 檔案頁面
 router.get('/archives', function (req, res, next) {
     let categories = {};
